@@ -1,4 +1,6 @@
+using WebApp.Client.Services;
 using WebApp.Components;
+using WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,10 @@ builder.Services.AddRazorComponents()
 
 
 builder.Services.AddControllers();
-builder.Services.AddHttpClient();
+
+var chatService = new ChatService();
+builder.Services.AddSingleton<IChatService>(chatService);
+builder.Services.AddSingleton<IMessageRelayService>(chatService);
 
 var app = builder.Build();
 

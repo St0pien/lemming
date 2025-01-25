@@ -2,6 +2,7 @@
 @using WebApp.Client.Components.UI.Chat
 @using Model
 @page "/"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
@@ -13,8 +14,3 @@
         <UserMessageForm />
     </div>
 </div>
-
-@code {
-    private List<Message> messages = [];
-];
-}

@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using Model.Payloads;
+using WebApp.Client.Services;
 
 namespace WebApp.Controllers;
 
 [ApiController]
 [Route("api/chat")]
-public class ChatController : ControllerBase
+public class ChatController(IChatService chatService) : ControllerBase
 {
     [HttpPost]
-    public void PostMessage([FromBody] MessagePayload payload)
+    public void PostMessage([FromBody] MessagePaylod payload)
     {
-        Console.WriteLine(payload.message);
+        chatService.SendUserMessage(payload.Message);
     }
 }

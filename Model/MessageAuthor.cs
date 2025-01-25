@@ -1,6 +1,7 @@
 namespace Model;
 
-public enum MessageAuthor {
+public enum MessageAuthor
+{
     Bot,
     User
 }
