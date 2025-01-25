@@ -1,0 +1,26 @@
+@using WebApp.Client.Components.UI.Icons
+@rendermode InteractiveAuto
+
+<form @onsubmit="OnSubmit" @onsubmit:preventDefault="true" id="msg-form"
+    class="flex items-center justify-center w-full h-full">
+
+    <div class="text-red-500">
+        @err
+    </div>
+
+    <div class="relative w-1/2 ">
+        <textarea @ref="userMessageInput" @onkeypress:preventDefault="enterPressed" @onkeypress="OnKeyPress"
+            autofocus="true" @bind="text" @bind:event="oninput"
+            class="w-full h-full px-8 py-4 text-white resize-none rounded-4xl min-w-96 bg-neutral-700 placeholder:text-neutral-300 field-sizing-content max-h-64"
+            placeholder="message here" />
+
+        @if (!string.IsNullOrEmpty(text))
+        {
+
+            <button
+                class="absolute z-10 flex items-center justify-center w-10 h-8 -translate-y-5 bg-white rounded-full cursor-pointer right-4 top-1/2">
+                <Send />
+            </button>
+        }
+    </div>
+</form>
