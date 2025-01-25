@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -6,7 +5,7 @@ using Model.Payloads;
 
 namespace WebApp.Client.Components.UI.Forms;
 
-public partial class UserMessage(HttpClient httpClient)
+public partial class UserMessageForm(HttpClient httpClient)
 {
     private HttpClient httpClient = httpClient;
     private string text = "";
