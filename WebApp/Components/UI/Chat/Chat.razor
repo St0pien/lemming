@@ -1,7 +1,7 @@
 @using Model;
 @rendermode InteractiveServer
 
-<div class="w-full overflow-y-auto">
+<div id="chat-container" class="w-full overflow-y-auto">
     <div class="w-1/2 py-16 mx-auto min-w-96">
         @foreach (var message in messages)
         {

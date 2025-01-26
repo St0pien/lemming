@@ -1,9 +1,10 @@
+using Microsoft.JSInterop;
 using Model;
 using WebApp.Services;
 
 namespace WebApp.Components.UI.Chat;
 
-public partial class Chat(IChatStatusService chatStatus) : IDisposable
+public partial class Chat(IChatStatusService chatStatus, IJSRuntime js) : IDisposable
 {
     private List<Message> messages = chatStatus.GetMessages();
     private ChatState chatState = chatStatus.ChatState;
@@ -30,5 +31,11 @@ public partial class Chat(IChatStatusService chatStatus) : IDisposable
     {
         this.chatState = chatState;
         InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        js.InvokeVoidAsync("scrollToLatest");
     }
 }
