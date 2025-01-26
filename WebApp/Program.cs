@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 
 var chatService = new ChatService();
 builder.Services.AddSingleton<IChatService>(chatService);
-builder.Services.AddSingleton<IMessageRelayService>(chatService);
+builder.Services.AddSingleton<IChatStatusService>(chatService);
 
 var app = builder.Build();
 

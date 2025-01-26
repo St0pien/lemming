@@ -14,10 +14,13 @@ public partial class UserMessageForm(IChatService chatService)
 
     private void OnSubmit()
     {
-        Console.WriteLine($"Submitted with {text}");
         chatService.SendUserMessage(text);
-
         text = "";
+    }
+
+    private void ResetChat()
+    {
+        chatService.StartNewChat();
     }
 
     private void OnKeyPress(KeyboardEventArgs eventArgs)

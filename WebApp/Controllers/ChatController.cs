@@ -12,4 +12,11 @@ public class ChatController(IChatService chatService) : ControllerBase
     {
         chatService.SendUserMessage(payload.Message);
     }
+
+    [HttpPost]
+    [Route("init")]
+    public void StartNewChat()
+    {
+        chatService.StartNewChat();
+    }
 }

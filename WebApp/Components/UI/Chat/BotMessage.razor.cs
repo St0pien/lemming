@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 
-namespace WebApp.Client.Components.UI.Chat;
+namespace WebApp.Components.UI.Chat;
 
-public partial class UserMessage
+public partial class BotMessage
 {
     [Parameter]
     public string Message { get; set; } = "";

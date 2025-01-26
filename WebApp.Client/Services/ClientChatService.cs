@@ -1,5 +1,4 @@
 using System.Net.Http.Json;
-using Model;
 
 namespace WebApp.Client.Services;
 
@@ -9,11 +8,15 @@ public class ClientChatService(HttpClient httpClient) : IChatService
 {
     public void SendUserMessage(string message)
     {
-        Console.WriteLine(httpClient.BaseAddress);
         httpClient.PostAsJsonAsync("chat", new MessagePaylod
         {
             Message = message
 
         });
+    }
+
+    public void StartNewChat()
+    {
+        Task.Run(() => httpClient.PostAsJsonAsync("chat/init", ""));
     }
 }

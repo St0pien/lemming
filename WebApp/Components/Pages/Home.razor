@@ -1,5 +1,5 @@
 ﻿@using WebApp.Client.Components.UI.Forms
-@using WebApp.Client.Components.UI.Chat
+@using WebApp.Components.UI.Chat
 @using Model
 @page "/"
 @rendermode InteractiveServer
@@ -8,7 +8,7 @@
 
 
 <div class="flex flex-col items-center justify-between w-dvw h-dvh bg-neutral-900">
-    <Chat Messages="messages" />
+    <Chat />
 
     <div class="w-full pb-8">
         <UserMessageForm />

@@ -1,0 +1,29 @@
+@using Model;
+@rendermode InteractiveServer
+
+<div class="w-full overflow-y-auto">
+    <div class="w-1/2 py-16 mx-auto min-w-96">
+        @foreach (var message in messages)
+        {
+            @if (message.Author == MessageAuthor.Bot)
+            {
+                <BotMessage Message="@(message.Content)" />
+            }
+            else
+            {
+                <UserMessage Message="@(message.Content)" />
+            }
+        }
+
+        <div class="text-white animate-pulse">
+            @if (chatState == ChatState.NotInitiliazed)
+            {
+                <span>Loading model...</span>
+            }
+            else if (chatState == ChatState.Processing)
+            {
+                <span>Processing...</span>
+            }
+        </div>
+    </div>
+</div>
