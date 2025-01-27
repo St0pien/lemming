@@ -2,12 +2,19 @@ using Model;
 using OllamaSharp;
 using OllamaSharp.Models.Chat;
 using WebApp.Client.Services;
+using WebApp.Tools;
 
 namespace WebApp.Services;
 
 public class ChatService : IChatService, IChatStatusService
 {
-    private const string SystemPrompt = "You are helpful bot with ability to use embedded web browser for automated browser tasks and scrapign activities. Use multiple tools at once if it'll help you achieve the task";
+    // private const string SystemPrompt = "You are helpful bot with ability to use embedded web browser for automated browser tasks and scraping activities. Use multiple tools at once if it'll help you achieve the task";
+    // private const string SystemPrompt = "You are browser automationt bot, you job is to orchestrate attached browser actions in order to achieve goals speciefied by user. Use you attached browser to find information, resources etc. Sequence your tool calls in order to perform task, for example: first google the resources click one of the links and retrieve content. Be proffesional and concise. Now wait for user instructions";
+    // private const string SystemPrompt = "You are an automation bot with access to web browser use it to help your users";
+    // private const string SystemPrompt = "You are an advanced AI which is responsible for planning and executing actions on attached to your system web browser in order to achieve tasks specified by the user. Use mix of your tools to achieve the goal. For example when use wants you to find something you can search the web for articles and then open of them and provide info about it to the user";
+    // private const string SystemPrompt = "You are a helpful AI assistant with access to attached web browser allowing you to search internet for latest informations, use this ability to answer based on fresh news from the world instead of relying on pretrained data";
+
+    private const string SystemPrompt = "You are helpful AI LLM Chat bot, but with unique ability to search internet for new information use it when your baked in knowledge is not enough";
 
     private List<Model.Message> messages = [];
     public event Action? OnChatUpdate;
@@ -24,9 +31,11 @@ public class ChatService : IChatService, IChatStatusService
     public event EventHandler<ChatState>? OnStateChanged = null;
     private Chat? chat = null;
     private CancellationTokenSource cancellation = new CancellationTokenSource();
+    private IBrowserTools browserTools;
 
-    public ChatService()
+    public ChatService(IBrowserTools browserTools)
     {
+        this.browserTools = browserTools;
         Task.Run(Init);
     }
 
@@ -57,7 +66,7 @@ public class ChatService : IChatService, IChatStatusService
 
         ChatState = ChatState.Processing;
 
-        var response = chat.SendAsync(message, [new NavigateTool(), new GetPageContentTool()], cancellationToken: cancellation.Token);
+        var response = chat.SendAsync(message, browserTools.GetTools(), cancellationToken: cancellation.Token);
         messages.Add(new(MessageAuthor.Bot, ""));
 
         bool toolsResolved;
@@ -81,22 +90,14 @@ public class ChatService : IChatService, IChatStatusService
                 foreach (var tool in toolCalls)
                 {
                     Console.WriteLine($"Call: {tool.Function!.Name}({string.Join(", ", tool.Function.Arguments!.Select(arg => $"{arg.Key}:{arg.Value}"))})");
+
+                    var toolResult = browserTools.ExecuteTool(tool.Function);
+
                     var last = messages.Last();
-                    if (tool.Function!.Name == "get_page_content")
-                    {
-                        messages.RemoveAt(messages.Count - 1);
-                        messages.Add(new(MessageAuthor.Bot, "[Browser action successfull]\nPageContent:\n<!DOCTYPE html><html><h1>x.com</html>"));
-                        messages.Add(last);
-                        Console.WriteLine("Hooray");
-                        response = chat.SendAsAsync(ChatRole.Tool, "[Browser action successfull]\nPageContent:\n<!DOCTYPE html><html><h1>x.com</html>", cancellation.Token);
-                    }
-                    else
-                    {
-                        messages.RemoveAt(messages.Count - 1);
-                        messages.Add(new(MessageAuthor.Bot, "[Browser action successfull]"));
-                        messages.Add(last);
-                        response = chat.SendAsAsync(ChatRole.Tool, "[Browser action successfull]", cancellation.Token);
-                    }
+                    messages.RemoveAt(messages.Count - 1);
+                    messages.Add(new(MessageAuthor.Bot, "[Searching web for related information]"));
+                    messages.Add(last);
+                    response = chat.SendAsAsync(ChatRole.Tool, toolResult, cancellation.Token);
                 }
             }
         } while (!toolsResolved);
@@ -106,6 +107,11 @@ public class ChatService : IChatService, IChatStatusService
 
     public void SendUserMessage(string message)
     {
+        if (ChatState == ChatState.NotInitiliazed)
+        {
+            return;
+        }
+
         if (ChatState != ChatState.Ready)
         {
             cancellation.Cancel();
@@ -129,63 +135,5 @@ public class ChatService : IChatService, IChatStatusService
         messages.Clear();
         OnChatUpdate?.Invoke();
         Task.Run(Init);
-    }
-}
-
-
-public sealed class NavigateTool : Tool
-{
-    public NavigateTool()
-    {
-        Function = new Function
-        {
-            Description = "Navigate to the url within your browser",
-            Name = "navigate",
-            Parameters = new Parameters
-            {
-                Properties = new Dictionary<string, Property>
-                {
-                    ["url"] = new() { Type = "string", Description = "url you want to navigate to" }
-                }
-
-            }
-        };
-
-        Type = "function";
-    }
-}
-
-public sealed class GotoTool : Tool
-{
-    public GotoTool()
-    {
-        Function = new Function
-        {
-            Description = "navigate to a given url using embedded browser",
-            Name = "navigate",
-            Parameters = new Parameters
-            {
-                Properties = new Dictionary<string, Property>
-                {
-                    ["url"] = new() { Type = "string", Description = "The url where embedded browser should navigate to" },
-                },
-                Required = ["url"],
-            }
-        };
-        Type = "function";
-    }
-}
-
-
-public sealed class GetPageContentTool : Tool
-{
-    public GetPageContentTool()
-    {
-        Function = new Function
-        {
-            Description = "Fetch html content from current opened page in embedded browser",
-            Name = "get_page_content",
-        };
-        Type = "function";
     }
 }

@@ -1,6 +1,7 @@
 using WebApp.Client.Services;
 using WebApp.Components;
 using WebApp.Services;
+using WebApp.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 
-var chatService = new ChatService();
+var browserTools = PlaywrightBrowserTools.Launch().Result;
+
+var chatService = new ChatService(browserTools);
 builder.Services.AddSingleton<IChatService>(chatService);
 builder.Services.AddSingleton<IChatStatusService>(chatService);
 
